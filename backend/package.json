@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4",
+    "cors": "^2",
+    "dotenv": "^16",
+    "jsonwebtoken": "^9",
+    "bcrypt": "^5"
+  }
+}
