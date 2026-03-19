@@ -6,6 +6,7 @@ export default function Suppliers() {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
+  const [editing, setEditing] = useState(null);
 
   const fetchSuppliers = async () => {
     const res = await axios.get("/api/suppliers");
@@ -16,12 +17,18 @@ export default function Suppliers() {
     fetchSuppliers();
   }, []);
 
-  const onFinish = async (values) => {
+const onFinish = async (values) => {
+  if (editing) {
+    await axios.put(`/api/suppliers/${editing.id}`, values);
+  } else {
     await axios.post("/api/suppliers", values);
-    setOpen(false);
-    form.resetFields();
-    fetchSuppliers();
-  };
+  }
+
+  setOpen(false);
+  setEditing(null);
+  form.resetFields();
+  fetchSuppliers();
+};
 
   return (
     <div style={{ padding: 20 }}>
@@ -29,16 +36,38 @@ export default function Suppliers() {
         Add Supplier
       </Button>
 
-      <Table
-        style={{ marginTop: 20 }}
-        dataSource={data}
-        rowKey="id"
-        columns={[
-          { title: "Company", dataIndex: "companyName" },
-          { title: "Email", dataIndex: "contactEmail" },
-          { title: "Status", dataIndex: "status" }
-        ]}
-      />
+    columns={[
+      { title: "Company", dataIndex: "companyName" },
+      { title: "Email", dataIndex: "contactEmail" },
+      { title: "Status", dataIndex: "status" },
+      {
+        title: "Action",
+        render: (_, record) => (
+          <>
+            <Button
+              onClick={() => {
+                form.setFieldsValue(record);
+                setOpen(true);
+                setEditing(record);
+              }}
+            >
+              Edit
+            </Button>
+
+            <Button
+              danger
+              style={{ marginLeft: 8 }}
+              onClick={async () => {
+                await axios.delete(`/api/suppliers/${record.id}`);
+                fetchSuppliers();
+              }}
+            >
+              Blacklist
+            </Button>
+          </>
+        )
+      }
+    ]}
 
       <Modal
         open={open}

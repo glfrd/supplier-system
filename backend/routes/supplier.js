@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-// TEMP DB (replace later with PostgreSQL)
 let suppliers = [];
 
-// GET all suppliers
+// GET all
 router.get("/", (req, res) => {
   res.json(suppliers);
 });
 
-// ADD supplier
+// ADD
 router.post("/", (req, res) => {
   const newSupplier = {
     id: Date.now(),
@@ -20,6 +19,28 @@ router.post("/", (req, res) => {
 
   suppliers.push(newSupplier);
   res.json(newSupplier);
+});
+
+// UPDATE
+router.put("/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  suppliers = suppliers.map(s =>
+    s.id === id ? { ...s, ...req.body } : s
+  );
+
+  res.send("Updated");
+});
+
+// DELETE / BLACKLIST
+router.delete("/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  suppliers = suppliers.map(s =>
+    s.id === id ? { ...s, status: "BLACKLISTED" } : s
+  );
+
+  res.send("Blacklisted");
 });
 
 module.exports = router;
